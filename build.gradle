@@ -23,6 +23,11 @@ dependencies {
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.36.0'
     implementation 'com.google.apis:google-api-services-sheets:v4-rev20240514-2.0.0'
     implementation 'com.google.http-client:google-http-client-gson:1.43.3'
+    implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
+    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+    implementation 'com.itextpdf:io:7.2.5'
+    implementation 'com.itextpdf:kernel:7.2.5'
+    implementation 'com.itextpdf:layout:7.2.5'
 }
 
 application {

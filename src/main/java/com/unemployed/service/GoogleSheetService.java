@@ -55,7 +55,7 @@ public class GoogleSheetService {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public void readSheet(String spreadsheetId, String range) {
+    public List<List<Object>> readSheet(String spreadsheetId, String range) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
@@ -71,17 +71,12 @@ public class GoogleSheetService {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
-            List<List<Object>> values = response.getValues();
-            if (values == null || values.isEmpty()) {
-                System.out.println("No data found.");
-            } else {
-                for (List<Object> row : values) {
-                    System.out.printf("%s, %s\n", row.get(0), row.get(2));
-                }
-            }
+
+            return response.getValues();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public void moveEntries(String spreadsheetId, String sheetName, String range) {
