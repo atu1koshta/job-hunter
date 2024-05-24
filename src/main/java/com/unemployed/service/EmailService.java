@@ -56,12 +56,12 @@ public class EmailService {
             message.setText(body);
 
             // Create MimeBodyPart for the message body
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(body);
+            BodyPart htmlBodyPart = new MimeBodyPart();
+            htmlBodyPart.setContent(body, "text/html");
 
             // Create Multipart to combine the message parts
             Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(htmlBodyPart);
 
             // Add the resume attachment
             if (attachments != null) {

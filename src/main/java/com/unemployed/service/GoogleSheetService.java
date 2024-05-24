@@ -55,7 +55,7 @@ public class GoogleSheetService {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public List<List<Object>> readSheet(String spreadsheetId, String range) {
+    public static List<List<Object>> readSheet(String spreadsheetId, String range) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
@@ -79,7 +79,7 @@ public class GoogleSheetService {
         return null;
     }
 
-    public void moveEntries(String spreadsheetId, String sheetName, String range) {
+    public static void moveEntries(String spreadsheetId, String sheetName, String range) {
         System.out.println("Moving entries in Google Sheet" + spreadsheetId + " " + sheetName + " " + range);
     }
 }
