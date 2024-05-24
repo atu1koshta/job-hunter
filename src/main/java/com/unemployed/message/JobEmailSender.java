@@ -76,11 +76,12 @@ public class JobEmailSender extends MessageSender {
     public void send() {
         List<List<Object>> data = readSheet();
 
-        for (List<Object> row : data) {
+        for (int i = 0; i < data.size(); i++) {
+            List<Object> row = data.get(i);
             try {
                 EmailContent emailContent = draftEmailContent(row);
                 EmailService.sendEmail(emailContent);
-                moveEntries();
+                moveEntry(i+2);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -88,8 +89,9 @@ public class JobEmailSender extends MessageSender {
         }
     }
 
-    private void moveEntries() {
-        String sheetName = "Applied";
-        GoogleSheetService.moveEntries(spreadSheetId, sheetName, "A1:Z100");
+    private void moveEntry(int rowIndex) {
+        String sourceSheetName = "Apply";
+        String targetSheetName = "Applied";
+        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetName, targetSheetName, rowIndex);
     }
 }

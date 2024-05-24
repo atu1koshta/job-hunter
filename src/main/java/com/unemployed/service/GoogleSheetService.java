@@ -13,9 +13,16 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,11 +66,6 @@ public class GoogleSheetService {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
-//             for service account credentials.json
-//             pass new HttpCredentialsAdapter(credentials)
-//            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(""))
-//                    .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
-
             Sheets service =
                     new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                             .setApplicationName(APPLICATION_NAME)
@@ -79,7 +81,53 @@ public class GoogleSheetService {
         return null;
     }
 
-    public static void moveEntries(String spreadsheetId, String sheetName, String range) {
-        System.out.println("Moving entries in Google Sheet" + spreadsheetId + " " + sheetName + " " + range);
+    public static void moveEntry(String spreadsheetId, String sourceSheetName, String targetSheetName, int rowIndex) {
+        try {
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+
+            // Read the row data from the source sheet
+            String sourceRange = sourceSheetName + "!" + rowIndex + ":" + rowIndex;
+            ValueRange response = service.spreadsheets().values()
+                    .get(spreadsheetId, sourceRange)
+                    .execute();
+            List<List<Object>> rowData = response.getValues();
+
+            if (rowData != null && !rowData.isEmpty()) {
+                // Append the current timestamp in IST to the row data
+                ZoneId istZoneId = ZoneId.of("Asia/Kolkata");
+                ZonedDateTime istTime = ZonedDateTime.now(istZoneId);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String timestamp = istTime.format(formatter);
+                rowData.get(0).add(timestamp);
+
+                // Append the row data to the target sheet
+                String targetRange = targetSheetName + "!A1";
+                ValueRange appendBody = new ValueRange()
+                        .setValues(rowData);
+                service.spreadsheets().values()
+                        .append(spreadsheetId, targetRange, appendBody)
+                        .setValueInputOption("USER_ENTERED")
+                        .execute();
+
+                // Remove the row from the source sheet
+                List<Request> requests = new ArrayList<>();
+                requests.add(new Request()
+                        .setDeleteDimension(new DeleteDimensionRequest()
+                                .setRange(new DimensionRange()
+                                        .setSheetId(0) // Assuming the source sheet ID is 0
+                                        .setDimension("ROWS")
+                                        .setStartIndex(rowIndex - 1) // -1 because rows are 0-indexed in the API
+                                        .setEndIndex(rowIndex))));
+                BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest()
+                        .setRequests(requests);
+                service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest)
+                        .execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
