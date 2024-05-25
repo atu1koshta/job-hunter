@@ -76,6 +76,10 @@ public class JobEmailSender extends MessageSender {
     public void send() {
         List<List<Object>> data = readSheet();
 
+        if(data == null) {
+            return;
+        }
+
         for (int i = 0; i < data.size(); i++) {
             List<Object> row = data.get(i);
             try {
