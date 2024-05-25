@@ -11,12 +11,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Properties;
 
 public class EmailService {
 
-    public static void sendEmail(EmailContent emailContent) {
+    public static void sendEmail(EmailContent emailContent) throws UnsupportedEncodingException {
+        final String fullName = "Atul Koshta";
         final String username = "atulk2018@gmail.com"; // your Gmail email
         final String password = "qhbxlqyvkxcphwmh"; // your Gmail app password
 
@@ -44,7 +46,7 @@ public class EmailService {
             Message message = new MimeMessage(session);
 
             // Set From: header field
-            message.setFrom(new InternetAddress(username));
+            message.setFrom(new InternetAddress(username, fullName));
 
             // Set To: header field
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
