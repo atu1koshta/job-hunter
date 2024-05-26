@@ -68,7 +68,7 @@ public class GoogleSheetService {
         return null;
     }
 
-    public static void moveEntry(String spreadsheetId, String sourceSheetName, String targetSheetName, int rowIndex) {
+    public static void moveEntry(String spreadsheetId, int sourceSheetId, String sourceSheetName, String targetSheetName, int rowIndex) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -104,7 +104,7 @@ public class GoogleSheetService {
                 requests.add(new Request()
                         .setDeleteDimension(new DeleteDimensionRequest()
                                 .setRange(new DimensionRange()
-                                        .setSheetId(0) // Assuming the source sheet ID is 0
+                                        .setSheetId(sourceSheetId) // Assuming the source sheet ID is 0
                                         .setDimension("ROWS")
                                         .setStartIndex(rowIndex - 1) // -1 because rows are 0-indexed in the API
                                         .setEndIndex(rowIndex))));

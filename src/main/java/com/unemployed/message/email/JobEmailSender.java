@@ -1,5 +1,7 @@
-package com.unemployed.message;
+package com.unemployed.message.email;
 
+import com.unemployed.helper.StringHelper;
+import com.unemployed.message.MessageSender;
 import com.unemployed.model.EmailContent;
 import com.unemployed.service.EmailService;
 import com.unemployed.service.GoogleSheetService;
@@ -11,15 +13,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JobEmailSender extends MessageSender {
+public class JobEmailSender extends EmailTemplate implements MessageSender {
     private final String spreadSheetId = "1XwEQae9Z6-nest8okXG6kKfygGkKYdb4XVt5eptAraA";
-
-    private static String removeBOM(String content) {
-        if (content.startsWith("\uFEFF")) {
-            content = content.substring(1);
-        }
-        return content;
-    }
 
     private List<List<Object>> readSheet() {
         String sheetName = "Apply";
@@ -27,17 +22,15 @@ public class JobEmailSender extends MessageSender {
         return GoogleSheetService.readSheet(spreadSheetId, range);
     }
 
-
-    private String greeting(String recipient) {
-        return "<p>Hi " + recipient + ",</p>";
-    }
-    private String readCoverLetterTemplate(String company, String role) throws IOException {
+    @Override
+    public String readMainContentTemplate(String company, String role) throws IOException{
         String content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "cover-letter.txt")), StandardCharsets.UTF_8);
         content = content.replace("{ROLE}", role).replace("{COMPANY}", company);
-        return removeBOM(content);
+        return StringHelper.removeBOM(content);
     }
 
-    private String createClosing() {
+    @Override
+    public String closing() {
         return "<p>"
                 + "<strong>Thank you for considering my application</strong>."
                 + " I would welcome the opportunity to discuss how my background, skills, and certifications will be beneficial to your team."
@@ -45,33 +38,12 @@ public class JobEmailSender extends MessageSender {
                 + "</p>";
     }
 
-    private String createEnclosure() {
-        return "<p><strong>Enclosure: Resume</strong></p>";
-    }
-    private String createSignature() {
-        return "<p style=\"font-family: 'Courier New', monospace;\">"
-                + "Best Regards,"
-                + "<br>"
-                + "Atul Koshta"
-                + "<br>"
-                + "Phone: +91 9713443774"
-                + "<br>"
-                + "Email: atulk2018@gmail.com"
-                + "<br> "
-                + "LinkedIn: <a href='https://www.linkedin.com/in/atulkoshta/'>https://www.linkedin.com/in/atulkoshta/</a>"
-                + "<br>"
-                + "GitHub: <a href='https://github.com/atu1koshta'>https://github.com/atu1koshta</a>"
-                + "</p>";
-    }
-
-
-
     private String createHtmlEmailBody(String recipient, String company, String role) throws IOException {
         String greeting = greeting(recipient);
-        String mainContent = readCoverLetterTemplate(company, role);
-        String closing = createClosing();
-        String enclosure = createEnclosure();
-        String signature = createSignature();
+        String mainContent = readMainContentTemplate(company, role);
+        String closing = closing();
+        String enclosure = enclosure();
+        String signature = signature();
 
         return "<html>"
                 + "<body>"
@@ -80,9 +52,9 @@ public class JobEmailSender extends MessageSender {
                 + "<br>"
                 + closing
                 + "<br>"
-                + enclosure
-                + "<br>"
                 + signature
+                + "<br>"
+                + enclosure
                 + "</body>"
                 + "</html>";
     }
@@ -125,8 +97,9 @@ public class JobEmailSender extends MessageSender {
     }
 
     private void moveEntry(int rowIndex) {
+        int sourceSheetId = 0;
         String sourceSheetName = "Apply";
         String targetSheetName = "Applied";
-        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetName, targetSheetName, rowIndex);
+        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, rowIndex);
     }
 }
