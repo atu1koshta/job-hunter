@@ -23,7 +23,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
     }
 
     @Override
-    public String readMainContentTemplate(String company, String role) throws IOException{
+    public String readMainContentTemplate(String company, String role) throws IOException {
         String content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "cover-letter.txt")), StandardCharsets.UTF_8);
         content = content.replace("{ROLE}", role).replace("{COMPANY}", company);
         return StringHelper.removeBOM(content);
@@ -65,7 +65,14 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         String company = (String) row.get(0);
         String role = (String) row.get(1);
         String to = (String) row.get(2);
-        String recipient = (String) row.get(3);
+
+        String recipient = "";
+        try {
+            recipient = (String) row.get(3);
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+
         String subject = "Application for " + role + " at " + company;
         String body = createHtmlEmailBody(recipient, company, role);
 

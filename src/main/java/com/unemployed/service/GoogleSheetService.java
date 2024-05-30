@@ -88,6 +88,11 @@ public class GoogleSheetService {
                 ZonedDateTime istTime = ZonedDateTime.now(istZoneId);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String timestamp = istTime.format(formatter);
+
+                while (rowData.get(0).size() < 4) {
+                    rowData.get(0).add("");
+                }
+                
                 rowData.get(0).add(timestamp);
 
                 // Append the row data to the target sheet
