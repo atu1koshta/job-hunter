@@ -23,17 +23,7 @@ public abstract class EmailTemplate {
                 + "</p>";
     };
 
-    public String closing() {
-        throw new UnsupportedOperationException("Closing method must be overridden");
-    }
-
-    public String closing_with_role_company(String role, String company) {
-        throw new UnsupportedOperationException("Closing method must be overridden");
-    }
-
     public String enclosure() {
         return "<p><strong>Enclosure: Resume</strong></p>";
     };
-
-    public abstract String readMainContentTemplate(String company, String role) throws IOException;
 }

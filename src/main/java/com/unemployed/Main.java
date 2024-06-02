@@ -1,15 +1,16 @@
 package com.unemployed;
 
-import com.unemployed.message.email.JobEmailSender;
+import com.unemployed.factory.AbstractMessageSenderFactory;
+import com.unemployed.factory.MessageSenderFactory;
 import com.unemployed.message.MessageSender;
-import com.unemployed.message.email.ReferralEmailSender;
-
 public class Main {
     public static void main(String[] args) {
-        MessageSender jobEmailSender = new JobEmailSender();
+        AbstractMessageSenderFactory messageSenderFactory = new MessageSenderFactory();
+
+        MessageSender jobEmailSender = messageSenderFactory.createJobEmailSender();
         jobEmailSender.send();
 
-        MessageSender referralEmailSender = new ReferralEmailSender();
+        MessageSender referralEmailSender = messageSenderFactory.createReferralEmailSender();
         referralEmailSender.send();
     }
 }

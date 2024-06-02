@@ -68,7 +68,7 @@ public class GoogleSheetService {
         return null;
     }
 
-    public static void moveEntry(String spreadsheetId, int sourceSheetId, String sourceSheetName, String targetSheetName, int rowIndex) {
+    public static void moveEntry(String spreadsheetId, int sourceSheetId, String sourceSheetName, String targetSheetName) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -76,7 +76,7 @@ public class GoogleSheetService {
                     .build();
 
             // Read the row data from the source sheet
-            String sourceRange = sourceSheetName + "!" + rowIndex + ":" + rowIndex;
+            String sourceRange = sourceSheetName + "!" + 2 + ":" + 2;
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, sourceRange)
                     .execute();
@@ -89,7 +89,7 @@ public class GoogleSheetService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String timestamp = istTime.format(formatter);
 
-                while (rowData.get(0).size() < 4) {
+                while (rowData.get(0).size() < 5) {
                     rowData.get(0).add("");
                 }
                 
@@ -111,8 +111,8 @@ public class GoogleSheetService {
                                 .setRange(new DimensionRange()
                                         .setSheetId(sourceSheetId) // Assuming the source sheet ID is 0
                                         .setDimension("ROWS")
-                                        .setStartIndex(rowIndex - 1) // -1 because rows are 0-indexed in the API
-                                        .setEndIndex(rowIndex))));
+                                        .setStartIndex(1) // -1 because rows are 0-indexed in the API
+                                        .setEndIndex(2))));
                 BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest()
                         .setRequests(requests);
                 service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest)

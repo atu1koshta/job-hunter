@@ -22,14 +22,12 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
         return GoogleSheetService.readSheet(spreadSheetId, range);
     }
 
-    @Override
     public String readMainContentTemplate(String company, String role) throws IOException {
         String content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "referral-request-template.txt")), StandardCharsets.UTF_8);
         content = content.replace("{ROLE}", role).replace("{COMPANY}", company);
         return StringHelper.removeBOM(content);
     }
 
-    @Override
     public String closing_with_role_company(String role, String company) {
         return "<p>"
                 + "I have attached my resume for your review. I would appreciate it if you could refer me for the "
@@ -63,8 +61,8 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
 
         String company = (String) row.get(0);
         String role = (String) row.get(1);
-        String to = (String) row.get(2);
-        String recipient = (String) row.get(3);
+        String to = (String) row.get(3);
+        String recipient = (String) row.get(2);
         String subject = "Referral Request for " + role + " at " + company;
         String body = createHtmlEmailBody(recipient, company, role);
 
@@ -87,7 +85,7 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
             try {
                 EmailContent emailContent = draftEmailContent(row);
                 EmailService.sendEmail(emailContent);
-                moveEntry(i + 2);
+                moveEntry();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -95,10 +93,10 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
         }
     }
 
-    private void moveEntry(int rowIndex) {
+    private void moveEntry() {
         int sourceSheetId = 1796076197;
         String sourceSheetName = "Referral";
         String targetSheetName = "Referral Applied";
-        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, rowIndex);
+        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName);
     }
 }
