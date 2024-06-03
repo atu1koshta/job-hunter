@@ -68,7 +68,7 @@ public class GoogleSheetService {
         return null;
     }
 
-    public static void moveEntry(String spreadsheetId, int sourceSheetId, String sourceSheetName, String targetSheetName) {
+    public static void moveEntry(String spreadsheetId, int sourceSheetId, String sourceSheetName, String targetSheetName, int totalCols) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -89,7 +89,7 @@ public class GoogleSheetService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String timestamp = istTime.format(formatter);
 
-                while (rowData.get(0).size() < 5) {
+                while (rowData.get(0).size() < totalCols) {
                     rowData.get(0).add("");
                 }
                 

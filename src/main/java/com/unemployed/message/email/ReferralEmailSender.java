@@ -97,6 +97,7 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
         int sourceSheetId = 1796076197;
         String sourceSheetName = "Referral";
         String targetSheetName = "Referral Applied";
-        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName);
+        int totalCols = 5;
+        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, totalCols);
     }
 }

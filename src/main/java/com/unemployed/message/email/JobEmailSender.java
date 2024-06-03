@@ -120,6 +120,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         int sourceSheetId = 0;
         String sourceSheetName = "Apply";
         String targetSheetName = "Applied";
-        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName);
+        int totalCols = 6;
+        GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, totalCols);
     }
 }
