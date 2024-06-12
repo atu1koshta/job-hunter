@@ -1,6 +1,7 @@
 package com.unemployed.message.email;
 
 import com.unemployed.constant.MessageSenderConstant;
+import com.unemployed.helper.EmailHelper;
 import com.unemployed.helper.StringHelper;
 import com.unemployed.message.MessageSender;
 import com.unemployed.model.EmailContent;
@@ -23,22 +24,33 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         return GoogleSheetService.readSheet(spreadSheetId, range);
     }
 
-    private String createSubject(String type, String company, String role) {
+    private String createSubject(String type, String company, String role, String jobId) {
+        String subject;
         if (type.equals(MessageSenderConstant.COMPANY)) {
-            return "Application for " + role + " at " + company;
+            subject = "Application for " + role + " at " + company;
         } else {
-            return "Application for " + role;
+            subject = "Application for " + role;
         }
+
+        if (jobId != null && !jobId.isEmpty()) {
+            subject += " (Job ID: " + jobId + ")";
+        }
+
+        return subject;
     }
 
-    public String readMainContentTemplate(String type, String company, String role) throws IOException {
-        String content;
+    public String readMainContentTemplate(String type, String company, String role, String jobId) throws IOException {
+        String cover_letter_file;
         if (type.equals(MessageSenderConstant.COMPANY)) {
-            content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "cover-letter.txt")), StandardCharsets.UTF_8);
+            cover_letter_file = "cover-letter.txt";
         } else {
-            content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "cover-letter-recruting-firm.txt")), StandardCharsets.UTF_8);
+            cover_letter_file = "cover-letter-recruting-firm.txt";
         }
+
+        String content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", cover_letter_file)), StandardCharsets.UTF_8);
         content = content.replace("{ROLE}", role).replace("{COMPANY}", company);
+        content = EmailHelper.addJobIdToBody(content, jobId);
+
         return StringHelper.removeBOM(content);
     }
 
@@ -50,9 +62,9 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
                 + "</p>";
     }
 
-    private String createHtmlEmailBody(String type, String recipient, String company, String role) throws IOException {
+    private String createHtmlEmailBody(String type, String recipient, String company, String role, String jobId) throws IOException {
         String greeting = greeting(recipient);
-        String mainContent = readMainContentTemplate(type, company, role);
+        String mainContent = readMainContentTemplate(type, company, role, jobId);
         String closing = closing();
         String enclosure = enclosure();
         String signature = signature();
@@ -76,18 +88,19 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
 
         String company = (String) row.get(0);
         String role = (String) row.get(1);
-        String to = (String) row.get(3);
-        String type = (String) row.get(4);
+        String jobId = (String) row.get(2);
+        String to = (String) row.get(4);
+        String type = (String) row.get(5);
 
         String recipient = "";
         try {
-            recipient = (String) row.get(2);
+            recipient = (String) row.get(3);
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
 
-        String subject = createSubject(type, company, role);
-        String body = createHtmlEmailBody(type, recipient, company, role);
+        String subject = createSubject(type, company, role, jobId);
+        String body = createHtmlEmailBody(type, recipient, company, role, jobId);
 
         ArrayList<String> attachments = new ArrayList<>();
         attachments.add(resumePath);
@@ -120,7 +133,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         int sourceSheetId = 0;
         String sourceSheetName = "Apply";
         String targetSheetName = "Applied";
-        int totalCols = 6;
+        int totalCols = 9;
         GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, totalCols);
     }
 }

@@ -1,5 +1,6 @@
 package com.unemployed.message.email;
 
+import com.unemployed.helper.EmailHelper;
 import com.unemployed.helper.StringHelper;
 import com.unemployed.message.MessageSender;
 import com.unemployed.model.EmailContent;
@@ -22,9 +23,21 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
         return GoogleSheetService.readSheet(spreadSheetId, range);
     }
 
-    public String readMainContentTemplate(String company, String role) throws IOException {
+    private String createSubject(String company, String role, String jobId) {
+        String subject = "Referral Request for " + role + " at " + company;
+
+        if (jobId != null && !jobId.isEmpty()) {
+            subject += " (Job ID: " + jobId + ")";
+        }
+
+        return subject;
+    }
+
+    public String readMainContentTemplate(String company, String role, String jobId) throws IOException {
         String content = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "referral-request-template.txt")), StandardCharsets.UTF_8);
         content = content.replace("{ROLE}", role).replace("{COMPANY}", company);
+        content = EmailHelper.addJobIdToBody(content, jobId);
+
         return StringHelper.removeBOM(content);
     }
 
@@ -35,9 +48,9 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
                 + "</p>";
     }
 
-    private String createHtmlEmailBody(String recipient, String company, String role) throws IOException {
+    private String createHtmlEmailBody(String recipient, String company, String role, String jobId) throws IOException {
         String greeting = greeting(recipient);
-        String mainContent = readMainContentTemplate(company, role);
+        String mainContent = readMainContentTemplate(company, role, jobId);
         String closing = closing_with_role_company(role, company);
         String enclosure = enclosure();
         String signature = signature();
@@ -61,10 +74,11 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
 
         String company = (String) row.get(0);
         String role = (String) row.get(1);
-        String to = (String) row.get(3);
-        String recipient = (String) row.get(2);
-        String subject = "Referral Request for " + role + " at " + company;
-        String body = createHtmlEmailBody(recipient, company, role);
+        String jobId = (String) row.get(2);
+        String to = (String) row.get(4);
+        String recipient = (String) row.get(3);
+        String subject = createSubject(company, role, jobId);
+        String body = createHtmlEmailBody(recipient, company, role, jobId);
 
         ArrayList<String> attachments = new ArrayList<>();
         attachments.add(resumePath);
@@ -97,7 +111,7 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
         int sourceSheetId = 1796076197;
         String sourceSheetName = "Referral";
         String targetSheetName = "Referral Applied";
-        int totalCols = 5;
+        int totalCols = 8;
         GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, totalCols);
     }
 }
