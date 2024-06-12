@@ -1,14 +1,5 @@
 package com.unemployed.helper;
 
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 public class EmailHelper {
     public static String addJobIdToBody(String body, String jobId) {
         if (jobId != null && !jobId.isEmpty()) {
