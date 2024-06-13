@@ -84,7 +84,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
     }
 
     private EmailContent draftEmailContent(List<Object> row) throws IOException {
-        String resumePath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "AtulKoshta_FullStackDeveloper_3YExp.pdf").toString();
+        String resumePath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "AtulKoshta_SoftwareDevelopmentEngineer_3YExp.pdf").toString();
 
         String company = (String) row.get(0);
         String role = (String) row.get(1);
