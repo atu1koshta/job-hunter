@@ -90,7 +90,8 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         String role = (String) row.get(1);
         String jobId = (String) row.get(2);
         String to = (String) row.get(4);
-        String type = (String) row.get(5);
+        String cc = (String) row.get(5);
+        String type = (String) row.get(6);
 
         String recipient = "";
         try {
@@ -105,7 +106,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         ArrayList<String> attachments = new ArrayList<>();
         attachments.add(resumePath);
 
-        return new EmailContent(to, subject, body, attachments);
+        return new EmailContent(to, cc, subject, body, attachments);
     }
 
     @Override
@@ -133,7 +134,7 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         int sourceSheetId = 0;
         String sourceSheetName = "Apply";
         String targetSheetName = "Applied";
-        int totalCols = 9;
+        int totalCols = 10;
         GoogleSheetService.moveEntry(spreadSheetId, sourceSheetId, sourceSheetName, targetSheetName, totalCols);
     }
 }

@@ -23,6 +23,7 @@ public class EmailService {
         final String password = "qhbxlqyvkxcphwmh"; // your Gmail app password
 
         String to = emailContent.getTo();
+        String cc = emailContent.getCc();
         String subject = emailContent.getSubject();
         String body = emailContent.getBody();
         ArrayList<String> attachments = emailContent.getAttachments();
@@ -50,6 +51,11 @@ public class EmailService {
 
             // Set To: header field
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+
+            // Set CC: header field
+            if (cc != null && !cc.isEmpty()) {
+                message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc));
+            }
 
             // Set Subject: header field
             message.setSubject(subject);
