@@ -43,8 +43,8 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
 
     public String closing_with_role_company(String role, String company) {
         return "<p>"
-                + "I have attached my resume for your review. I would appreciate it if you could refer me for the "
-                + "<strong>" + role + "</strong> position at <strong>" + company + "</strong>."
+                + "<strong>I have attached my resume for your review.</strong> If you find my qualifications suitable, "
+                + "I would appreciate your consideration in referring me for the role."
                 + "</p>";
     }
 
@@ -59,7 +59,6 @@ public class ReferralEmailSender extends EmailTemplate implements MessageSender 
                 + "<body>"
                 + greeting
                 + mainContent
-                + "<br>"
                 + closing
                 + "<br>"
                 + signature
