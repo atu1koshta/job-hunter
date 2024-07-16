@@ -56,7 +56,8 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
 
     public String closing(String company) {
         return "<p>"
-            + "I look forward to the opportunity to discuss how my background, skills and expertise align with the needs of " + company + "."
+            + "I look forward to the opportunity to discuss how my background, skills and expertise align with the needs"
+            + "of " + company + ". <strong>I have attached my resume for your review.</strong>"
             + "</p>"
             + "<p>"
             + "Thank you for considering my application. I hope to hear from you soon."
