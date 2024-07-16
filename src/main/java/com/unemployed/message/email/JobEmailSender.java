@@ -54,18 +54,19 @@ public class JobEmailSender extends EmailTemplate implements MessageSender {
         return StringHelper.removeBOM(content);
     }
 
-    public String closing() {
+    public String closing(String company) {
         return "<p>"
-                + "<strong>Thank you for considering my application</strong>."
-                + " I would welcome the opportunity to discuss how my background, skills, and certifications will be beneficial to your team."
-                + " I am available for an interview at your earliest convenience and look forward to hearing from you."
-                + "</p>";
+            + "I look forward to the opportunity to discuss how my background, skills and expertise align with the needs of " + company + "."
+            + "</p>"
+            + "<p>"
+            + "Thank you for considering my application. I hope to hear from you soon."
+            + "</p>";
     }
 
     private String createHtmlEmailBody(String type, String recipient, String company, String role, String jobId) throws IOException {
         String greeting = greeting(recipient);
         String mainContent = readMainContentTemplate(type, company, role, jobId);
-        String closing = closing();
+        String closing = closing(company);
         String enclosure = enclosure();
         String signature = signature();
 
